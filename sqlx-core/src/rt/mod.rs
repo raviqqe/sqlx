@@ -63,18 +63,7 @@ where
     F: Future + Send + 'static,
     F::Output: Send + 'static,
 {
-    #[cfg(feature = "_rt-tokio")]
-    if let Ok(handle) = tokio::runtime::Handle::try_current() {
-        return JoinHandle::Tokio(handle.spawn(fut));
-    }
-
-    #[cfg(feature = "_rt-async-std")]
-    {
-        return JoinHandle::AsyncStd(async_std::task::spawn(fut));
-    }
-
-    #[cfg(not(feature = "_rt-async-std"))]
-    missing_rt(fut)
+    return JoinHandle::Tokio(tokio::runtime::Handle::try_current().unwrap().spawn(fut));
 }
 
 #[track_caller]
